@@ -5,19 +5,37 @@ use std::io::prelude::*;
 // Create an easy alias for all the error handling stuff
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
+/// The state (stop, pause, play) of MPD is stored in an enum when asked from the daemon
 pub enum StateOfPlay {
     Stop,
     Pause,
     Play,
 }
 
+/// This struct stores a buffer and a Unix socket to talk to MPD.
+///
+/// we use a Unix socket to communicate to the Music Player Daemon.
+/// It's a cleartext protocol and MPD talks back, which is cosy.
+/// The connection struct and implementation of it, are the backbone of this lib.
+/// 
+/// Use Connect::new("/home/user/.mpd/socket/") to create a new connection.
 pub struct Connection {
     stream: UnixStream,
     buffer: [u8; 2048],
 }
 
 impl Connection {
-
+    /// Connects to MPD and stores the connection details
+    ///
+    /// You first have to connect to MPD in order to control it.
+    /// Start a new connection wth this "new" function.
+    ///
+    /// # Arguments
+    /// * 'sock' - A string slice containing the path to the MPD Unix socket.
+    ///
+    /// # Returns
+    /// You get a Connection struct back, with connection and buffer in it.
+    /// It's inside a Result type, so errors propagate upstream with this one.
     pub fn new(sock: &str) -> Result<Connection> {
 
         let mut newsock = UnixStream::connect(sock)?;
@@ -37,7 +55,7 @@ impl Connection {
         })
     }
 
-    fn get_status(&mut self) -> Result<MpdStatus> {
+    fn _get_status(&mut self) -> Result<MpdStatus> {
         // ask for the current status
         self.stream.write_all(b"status\n")?;
         self.stream.read(&mut self.buffer)?;
@@ -79,7 +97,7 @@ impl Connection {
         Ok(result)
     }
 
-    fn get_song(&mut self) -> Result<Song> {
+    fn _get_song(&mut self) -> Result<Song> {
         // ask for the current song
         self.stream.write_all(b"currentsong\n")?;
         self.stream.read(&mut self.buffer)?;
@@ -116,12 +134,12 @@ impl Connection {
                               let index: usize = self.buffer.iter().position(|&x| x == b'}').unwrap();
                               let end: usize = self.buffer.iter().position(|&x| x == b'\n').unwrap();
                               let message = std::str::from_utf8(&self.buffer[index+2..end])?;
-                              Ok((message.to_string(), self.get_status()?.state))
+                              Ok((message.to_string(), self._get_status()?.state))
                           } 
                           else if self.buffer.starts_with(b"OK") { 
-                              let nowsong = self.get_song()?;
+                              let nowsong = self._get_song()?;
                               let track = format!("{} - {}", nowsong.artist, nowsong.title);
-                              Ok((track, self.get_status()?.state))
+                              Ok((track, self._get_status()?.state))
                           } else {
                               panic!("got a response from MPD which I do not understand");
                           } 
@@ -130,20 +148,54 @@ impl Connection {
 
     }
 
+    /// This function asks MPD to skip to the next song in the playlist
+    ///
+    /// # Returns
+    /// A tuple (artist-title, state) with:
+    /// * the artist-title of the new song (the next song, so to speak).
+    /// * the state of MPD (play/pause/stopped).
+    /// or it returns an "error" message instead of artist-title if MPD is mad at you.
+    /// You can't "next" for example if MPD is not playing anything at all.
     pub fn next(&mut self) -> Result<(String, StateOfPlay)> {
         self._command("next")
     }
 
+    /// This function asks MPD to skip back to the  previous song in the playlist
+    ///
+    /// # Returns
+    /// A tuple (artist-title, state) with:
+    /// * the artist-title of the new song (the previous song, so to speak).
+    /// * the state of MPD (play/pause/stopped).
+    /// or it returns an "error" message instead of artist-title if MPD is mad at you.
+    /// You can't "previous" for example if MPD is not playing anything at all.
     pub fn previous(&mut self) -> Result<(String, StateOfPlay)> {
         self._command("previous")
     }
 
+    /// Asks MPD to stop playing music 
+    ///
+    /// # Returns
+    /// A tuple (artist-title, state) with:
+    /// * the artist-title of the song where it stopped.
+    /// * the state of MPD (which should be StateOfPlay::Stop).
     pub fn stop(&mut self) -> Result<(String, StateOfPlay)> {
         self._command("stop")
     }
 
+    /// If music is playing, it pauses it. else it starts playing music
+    ///
+    /// this function is specially designed for keyboards with a combined
+    /// play/pause mediakey. Look for a key with both a play triangle and the
+    /// two stripes pause logo. This function does what should happen if you press that button.
+    /// It starts playing if it isn't and it pauses playing if it is.
+    ///
+    /// # Returns
+    /// A tuple (artist-title, state) with:
+    /// * the artist-title of the new song (the previous song, so to speak).
+    /// * the state of MPD (should be Play or Pause from the StateOfPlay enum).
+    /// or it returns an "error" message instead of artist-title if MPD is mad at you.
     pub fn toggle(&mut self) -> Result<(String, StateOfPlay)> {
-        let status = self.get_status()?;
+        let status = self._get_status()?;
         // below looks weird, but the "pause" command actually toggles play/pause
         // in mpd. "play" only starts playing if stopped.
         match status.state {

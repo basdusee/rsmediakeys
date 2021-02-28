@@ -18,6 +18,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                .value_name("SOCKET")
                                .help("Let rsmediakeys know where the mpd control socket is. Defaults to ~/.config/mpd/socket")
                                .takes_value(true))
+                          .arg(Arg::with_name("icondir")
+                               .short("i")
+                               .long("icondir")
+                               .value_name("ICONDIR")
+                               .help("Use this directory for the icons sent to the DBUS messenger. Defaults to /usr/share/icons/hicolor/scalable")
+                               .takes_value(true))
                           .subcommand(SubCommand::with_name("next")
                                       .about("Switch to next song in playlist"))
                           .subcommand(SubCommand::with_name("prev")
@@ -34,7 +40,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let sock = matches.value_of("socket").unwrap_or(&defaultsocket); 
     let mut mpd = Connection::new(sock)?;
 
-    let icondir = format!("{}/.config/dunst/dunsticons/", env!("HOME"));
+    let defaulticondir = format!("{}/.local/share/icons", env!("HOME"));
+    let icondir = matches.value_of("icondir").unwrap_or(&defaulticondir); 
     let nexticon = format!("{}{}", icondir, "media-skip-forward-symbolic.svg");
     let previcon = format!("{}{}", icondir, "media-skip-backward-symbolic.svg");
     let stopicon = format!("{}{}", icondir, "media-playback-stop.svg");
