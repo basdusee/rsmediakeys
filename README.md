@@ -46,6 +46,11 @@ The intention and idea is to use it in a config file or script to control MPD.
 I use it in my i3 config file to capture mediakeys press events and talk to MPD about it,
 but it can for sure be used by sxhkd probably, or in dwm's config.h.
 
+It uses clap for command line parameter stuff, and notify-rust for the OSD notify things.
+Both are awesome libraries.
+* https://crates.io/crates/clap
+* https://crates.io/crates/notify-rust
+
 ## Installation
 
 You need to have Rust installed. The programming language that is, not the game.
@@ -60,7 +65,7 @@ Then just copy ./target/release/rsmediakeys to a useful place.
 
 ## Configuration
 
-I use I3 and in the i3config just put something like this:
+I use i3 and in the i3config just put something like this:
 ```
 # set Thinkpad play/pause/next keys to control mpd
 bindsym XF86AudioPlay exec --no-startup-id $somedir/rsmediakeys toggle
@@ -77,7 +82,7 @@ You have to arrange the icons for yourself. This is because everybody has a diff
 
 It will look into ~/.local/share/icons for spefically named icons.
 These icons are mostly present in modern icon sets, so you can look in your own icon set if they are there.
-They are found in the /usr/share/icons/<themename>/scalable/actions directory.
+They are found in the /usr/share/icons/somethemename/scalable/actions directory.
 
 The names are:
 * media-skip-forward-symbolic.svg
@@ -116,11 +121,32 @@ SUBCOMMANDS:
     stop      Stops mpd from playing
     toggle    Pauses or unpauses mpd, start playing if stopped
 ```
+## Disclaimers, FAQ, Troubleshooting and stuff
 
 Enjoy!
 
-This is only tested on Arch Linux with i3gaps on a Thinkpad x220.
-Good luck with anything other than that. It shoudn't be hard to adjust though.
+This is only tested on Arch Linux with i3gaps on a Thinkpad x220 with the US keyboard layout. 
+The Music Player Daemon version is 0.22.4 and it is run as a deamon under my own user account. It starts when logging into i3.
+I didn't test it with a MPD daemon started at the system level or as root. As long as you can read/write the Unix socket, it should be alright.
+Good luck with anything other than this setup. It shoudn't be hard to adjust though.
+
+_Hey I press buttons but no music is starting, what's happening? I see a popup with just a stripe/minus_
+You need to make a playlist in a proper MPD client (like ncmpcpp) to be able to use the keys. 
+There is no playlist management in rsmediakeys.
+
+_I press the "next" key and there is a popup saying "Not Playing"_
+That's right. You can't "next" if MPD is not playing music. This is a MPD feature, not a rsmediakeys one. 
+The fix is obvious, hit the "play/pause" button, and then the "next" button.
+Fun fact, the actual string "Not Playing" comes from MPD and is an error message.
+This string isn't embedded in rsmediakeys at all. The rsmediakeys program will just copy/paste error messages from MPD.
+
+_My popup notifications look ugly_
+Please refer to the documentation of your notification manager to beautify it. Rsmediakeys just puts text into a bus and is not responsible for the display side of things.
+
+_I want to collaborate and/or push some changes to this microscopic project_
+Any help in form of descriptive and friendly issues or comprehensive pull requests are welcome!
+Please do. Just open an issue or generate a pull request. Because of the size of this project it isn't well managed, so do as you think is fit for the occasion.
+There will be some more guidlines on the licenses of pull requests in the future.
 
 ## Todo
 * icon management should be a little more polished
@@ -136,5 +162,3 @@ Good luck with anything other than that. It shoudn't be hard to adjust though.
 * lcd backlight buttons, please use the incredible light program for this. It has the worst naming ever (try searching "light" on the internet) but it's the best out there by far: https://github.com/haikarainen/light
 * full mpc replacement and/or full MPD client functionality including playlist management et al.
 * it probably won't get a gui/tui. It's buttons. On the keyboard. That's it.
-
-
