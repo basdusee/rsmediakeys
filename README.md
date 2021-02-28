@@ -130,20 +130,20 @@ The Music Player Daemon version is 0.22.4 and it is run as a deamon under my own
 I didn't test it with a MPD daemon started at the system level or as root. As long as you can read/write the Unix socket, it should be alright.
 Good luck with anything other than this setup. It shoudn't be hard to adjust though.
 
-###_Hey I press buttons but no music is starting, what's happening? I see a popup with just a stripe/minus_
+### _Hey I press buttons but no music is starting, what's happening? I see a popup with just a stripe/minus_
 You need to make a playlist in a proper MPD client (like ncmpcpp) to be able to use the keys. 
 There is no playlist management in rsmediakeys.
 
-###_I press the "next" key and there is a popup saying "Not Playing"_
+### _I press the "next" key and there is a popup saying "Not Playing"_
 That's right. You can't "next" if MPD is not playing music. This is a MPD feature, not a rsmediakeys one. 
 The fix is obvious, hit the "play/pause" button, and then the "next" button.
 Fun fact, the actual string "Not Playing" comes from MPD and is an error message.
 This string isn't embedded in rsmediakeys at all. The rsmediakeys program will just copy/paste error messages from MPD.
 
-###_My popup notifications look ugly_
+### _My popup notifications look ugly_
 Please refer to the documentation of your notification manager to beautify it. Rsmediakeys just puts text into a bus and is not responsible for the display side of things.
 
-###_I want to collaborate and/or push some changes to this microscopic project_
+### _I want to collaborate and/or push some changes to this microscopic project_
 Any help in form of descriptive and friendly issues or comprehensive pull requests are welcome!
 Please do. Just open an issue or generate a pull request. Because of the size of this project it isn't well managed, so do as you think is fit for the occasion.
 There will be some more guidlines on the licenses of pull requests in the future.
