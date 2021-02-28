@@ -22,7 +22,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                .short("i")
                                .long("icondir")
                                .value_name("ICONDIR")
-                               .help("Use this directory for the icons sent to the DBUS messenger. Defaults to /usr/share/icons/hicolor/scalable")
+                               .help("Use this directory for the icons sent to the DBUS messenger. Defaults to ~/.local/share/icons")
                                .takes_value(true))
                           .subcommand(SubCommand::with_name("next")
                                       .about("Switch to next song in playlist"))
@@ -42,11 +42,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let defaulticondir = format!("{}/.local/share/icons", env!("HOME"));
     let icondir = matches.value_of("icondir").unwrap_or(&defaulticondir); 
-    let nexticon = format!("{}{}", icondir, "media-skip-forward-symbolic.svg");
-    let previcon = format!("{}{}", icondir, "media-skip-backward-symbolic.svg");
-    let stopicon = format!("{}{}", icondir, "media-playback-stop.svg");
-    let playicon = format!("{}{}", icondir, "media-playback-start-symbolic.svg");
-    let pauseicon = format!("{}{}", icondir, "media-playback-pause-symbolic.svg");
+    let nexticon = format!("{}{}", icondir, "/media-skip-forward-symbolic.svg");
+    let previcon = format!("{}{}", icondir, "/media-skip-backward-symbolic.svg");
+    let stopicon = format!("{}{}", icondir, "/media-playback-stop.svg");
+    let playicon = format!("{}{}", icondir, "/media-playback-start-symbolic.svg");
+    let pauseicon = format!("{}{}", icondir, "/media-playback-pause-symbolic.svg");
 
     // Check if we are in X windows with notify_send capabilities
     match std::env::var("XDG_SEAT") { 

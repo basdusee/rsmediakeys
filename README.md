@@ -46,12 +46,19 @@ The intention and idea is to use it in a config file or script to control MPD.
 I use it in my i3 config file to capture mediakeys press events and talk to MPD about it,
 but it can for sure be used by sxhkd probably, or in dwm's config.h.
 
-## Usage
+## Installation
 
-Just do the obvious. git clone this stuff and do:
+You need to have Rust installed. The programming language that is, not the game.
+This is documented extensively on this great thing called the interwebz and I won't repeat it here.
+But you can find a small hint here: https://www.rust-lang.org/tools/install
+This code was developed on a userspace install of Rust using rustup. 
+
+To create the program, just do the obvious. git clone this stuff and do:
 `cargo build --release`
 It compiles some dependancies and an executable.
 Then just copy ./target/release/rsmediakeys to a useful place.
+
+## Configuration
 
 I use I3 and in the i3config just put something like this:
 ```
@@ -63,21 +70,69 @@ bindsym XF86AudioStop exec --no-startup-id $somedir/rsmediakeys stop
 ```
 of course you need to set the $somedir variable or put a real path there.
 
+## Icons
+
+The iffy part for now is in the icons which are sent to the popup windows (dunst..).
+You have to arrange the icons for yourself. This is because everybody has a different preference in icons.
+
+It will look into ~/.local/share/icons for spefically named icons.
+These icons are mostly present in modern icon sets, so you can look in your own icon set if they are there.
+They are found in the /usr/share/icons/<themename>/scalable/actions directory.
+
+The names are:
+* media-skip-forward-symbolic.svg
+* media-skip-backward-symbolic.svg
+* media-playback-stop-symbolic.svg
+* media-playback-start-symbolic.svg
+* media-playback-pause-symbolic.svg
+
+You can also rename them in the src/main.rs file if you really want to.
+I used one of the more populair icon sets to get mine. I think it was Papyrus.
+In the "normal" set (not the dark or the light variant) there is a symbolic folder with an action folder, with this files in it.
+
+## Manpage
+
+I'll just repeat the help from the command line here:
+
+```
+Command line mpd client tailored for mediakeys, useful for Dunst and special Thinkpad keys
+
+USAGE:
+    rsmediakeys [OPTIONS] [SUBCOMMAND]
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -i, --icondir <ICONDIR>    Use this directory for the icons sent to the DBUS messenger. Defaults to
+                               ~/.local/share/icons
+    -s, --socket <SOCKET>      Let rsmediakeys know where the mpd control socket is. Defaults to ~/.config/mpd/socket
+
+SUBCOMMANDS:
+    help      Prints this message or the help of the given subcommand(s)
+    next      Switch to next song in playlist
+    prev      Switch to previous song in playlist
+    stop      Stops mpd from playing
+    toggle    Pauses or unpauses mpd, start playing if stopped
+```
+
 Enjoy!
 
-This is only tested on Arch Linux with i3 on a Thinkpad x220.
+This is only tested on Arch Linux with i3gaps on a Thinkpad x220.
 Good luck with anything other than that. It shoudn't be hard to adjust though.
 
 ## Todo
 * icon management should be a little more polished
 * maybe album art in the on screen pop-up? 
-* documentation has a non-existential crisis, because it is non-existing.
+* documentation has an existential crisis, because it is non-existing.
 * output to notification pop-up or to console should be more customizable other than just hacking it in the code
+* MPD accepts compound commands, it's probably more efficient in some cases and opens up the possibility to simplify this code.
 * maybe some hook pospibility, that it starts your full-fledged music client (ncmpcpp probably) if the playlist runs out.
 * there is an almost infinite scale-up in functionality. It does 0,1% of what mpc does, so ... but maybe that's a strength.
 * there's also the possibility to integrate volume as well, but that gets complicated very quickly and is easily done with other command line tools.
 
-## probably never do
+## Probably never do
 * lcd backlight buttons, please use the incredible light program for this. It has the worst naming ever (try searching "light" on the internet) but it's the best out there by far: https://github.com/haikarainen/light
 * full mpc replacement and/or full MPD client functionality including playlist management et al.
 * it probably won't get a gui/tui. It's buttons. On the keyboard. That's it.
