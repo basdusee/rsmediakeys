@@ -7,9 +7,9 @@ Minimalistic MPD client to use laptop multimedia keys with Music Player Daemon
 
 This command line tool is a very stripped down Music Player Daemon client.
 It is used to make your media keys work correct if you:
-* run Linux (btw. I run Arch :)
-* probably run a tiling/simple Window Manager (I use i3, but things like Xmonad, bspwm, dwm, you get the drift)
-* run Dunst or another notify daemon. If notify-send works, you are probably fine.
+* run Linux (This software is tested on Arch and NixOS)
+* probably run a tiling/simple Window Manager (I use Xmonad, but things like i3, bspwm, dwm, you get the drift)
+* run Dunst or another notify daemon. If notify-send or dunstify works, you are probably fine. 
 * run Music Player Daemon as a primary music player
 * have a laptop/keyboard which has media keys (play/pause/stop) which Xorg recognizes
 
@@ -43,8 +43,9 @@ If it detects that you are in a notify-send capable environment, it will give a 
 else it will print some stuff to the terminal.
 
 The intention and idea is to use it in a config file or script to control MPD.
-I use it in my i3 config file to capture mediakeys press events and talk to MPD about it,
+I use it in my Xmonad config file to capture mediakeys press events and talk to MPD about it,
 but it can for sure be used by sxhkd probably, or in dwm's config.h.
+You can find an i3 config below as well, that's my old config.
 
 It uses clap for command line parameter stuff, and notify-rust for the OSD notify things.
 Both are awesome libraries.
@@ -65,8 +66,18 @@ Then just copy ./target/release/rsmediakeys to a useful place.
 
 ## Configuration
 
-I use i3 and in the i3config just put something like this:
+I use Xmonad and you can use key bindings as below, for example:
 ```
+   , ((0, xF86XK_AudioPlay),  spawn ("rsmediakeys toggle"))
+   , ((0, xF86XK_AudioStop),  spawn ("rsmediakeys stop"))
+   , ((0, xF86XK_AudioPrev),  spawn ("rsmediakeys prev"))
+   , ((0, xF86XK_AudioNext),  spawn ("rsmediakeys next"))
+```
+Don't forget to `import Graphics.X11.ExtraTypes.XF86` for thje XF86XK_AudioX keybindings.
+
+If you are more of an i3 person, in the i3config just put something like this:
+```
+
 # set Thinkpad play/pause/next keys to control mpd
 bindsym XF86AudioPlay exec --no-startup-id $somedir/rsmediakeys toggle
 bindsym XF86AudioNext exec --no-startup-id $somedir/rsmediakeys next
@@ -125,8 +136,9 @@ SUBCOMMANDS:
 
 Enjoy!
 
-This is only tested on Arch Linux with i3gaps on a Thinkpad x220 with the US keyboard layout. 
-The Music Player Daemon version is 0.22.4 and it is run as a deamon under my own user account. It starts when logging into i3.
+This is only tested on a Thinkpad x220 with the US keyboard layout.
+The tested OSes are Arch with i3gaps, Arch with XMonad and NixOS with XMonad. 
+The Music Player Daemon version is 0.22.4 and it is run as a deamon under my own user account. It starts when logging into Xmonad (or i3 in the past).
 I didn't test it with a MPD daemon started at the system level or as root. As long as you can read/write the Unix socket, it should be alright.
 Good luck with anything other than this setup. It shoudn't be hard to adjust though.
 
