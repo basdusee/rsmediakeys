@@ -1,14 +1,13 @@
 [package]
 name = "rsmediakeys"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Bas Dusee <basdusee@hotmail.com>"]
 edition = "2018"
 license = "MIT/Apache-2.0"
 keywords = ["mpd", "laptopkeys"]
 
 [dependencies]
-notify-rust = "4.2.2"
+notify-rust = "4.5.8"
 
 [dependencies.clap]
-version = "~2.33"
-default-features = false
+version = "3.2.16"
